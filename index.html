@@ -111,10 +111,27 @@ body {
 }
 .header-right { display: flex; gap: 8px; }
 
+.btn-generate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 22px;
+    border: 1px solid rgba(102,187,106,0.4);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: rgba(102,187,106,0.85);
+    background: rgba(102,187,106,0.1);
+    transition: all 0.2s;
+    gap: 6px;
+}
+.btn-generate:active { transform: scale(0.97); background: rgba(102,187,106,0.2); }
+
 /* 统计卡片 */
 .stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     margin-bottom: 16px;
 }
@@ -129,7 +146,6 @@ body {
 .stat-label { font-size: 11px; color: #888; }
 .stat-total .stat-num { color: #64b5f6; }
 .stat-active .stat-num { color: #66bb6a; }
-.stat-bound .stat-num { color: #ce93d8; }
 .stat-expired .stat-num { color: #ef5350; }
 
 /* 操作栏 */
@@ -465,7 +481,7 @@ body {
         <div class="header">
             <div class="header-title">🔐 CAT HUB 卡密管理</div>
             <div class="header-right">
-                <button class="btn btn-success btn-small" onclick="showGenerateModal()">+ 生成卡密</button>
+                <button class="btn-generate" onclick="showGenerateModal()">＋ 生成卡密</button>
                 <button class="btn btn-secondary btn-small" onclick="showSettings()">⚙ 设置</button>
             </div>
         </div>
@@ -473,15 +489,11 @@ body {
         <div class="stats">
             <div class="stat-card stat-total">
                 <div class="stat-num" id="statTotal">0</div>
-                <div class="stat-label">总数</div>
+                <div class="stat-label">全部</div>
             </div>
             <div class="stat-card stat-active">
                 <div class="stat-num" id="statActive">0</div>
-                <div class="stat-label">可用</div>
-            </div>
-            <div class="stat-card stat-bound">
-                <div class="stat-num" id="statBound">0</div>
-                <div class="stat-label">已绑定</div>
+                <div class="stat-label">有效</div>
             </div>
             <div class="stat-card stat-expired">
                 <div class="stat-num" id="statExpired">0</div>
@@ -891,16 +903,14 @@ async function refreshKeys() {
 
 function updateStats() {
     const total = state.keys.length;
-    let active = 0, bound = 0, expired = 0;
+    let active = 0, expired = 0;
     for (const k of state.keys) {
         const s = getKeyStatus(k);
-        if (s.cls === 'status-active') active++;
-        if (s.cls === 'status-bound') { active++; bound++; }
+        if (s.cls === 'status-active' || s.cls === 'status-bound') active++;
         if (s.cls === 'status-expired') expired++;
     }
     document.getElementById('statTotal').textContent = total;
     document.getElementById('statActive').textContent = active;
-    document.getElementById('statBound').textContent = bound;
     document.getElementById('statExpired').textContent = expired;
 }
 
