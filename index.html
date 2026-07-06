@@ -115,18 +115,18 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 28px;
-    border: 1px solid rgba(102,187,106,0.4);
+    padding: 14px 32px;
+    border: 1px solid rgba(102,187,106,0.45);
     border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
-    color: rgba(102,187,106,0.9);
-    background: rgba(102,187,106,0.12);
+    color: rgba(102,187,106,0.95);
+    background: rgba(102,187,106,0.15);
     transition: all 0.2s;
     gap: 6px;
 }
-.btn-generate:active { transform: scale(0.97); background: rgba(102,187,106,0.25); }
+.btn-generate:active { transform: scale(0.97); background: rgba(102,187,106,0.3); }
 
 .btn-settings {
     width: 36px;
@@ -519,7 +519,7 @@ body {
 
         <div class="toolbar">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="搜索卡密/设备ID..." oninput="filterKeys()">
+                <input type="text" id="searchInput" placeholder="搜索卡密..." oninput="filterKeys()">
             </div>
             <button class="btn btn-secondary btn-small" onclick="refreshKeys()">🔄 刷新</button>
             <button class="btn btn-warning btn-small" onclick="showExportModal()">📤 导出</button>
@@ -577,28 +577,6 @@ body {
         <div class="modal-actions">
             <button class="btn btn-secondary" onclick="hideGenerateModal()">取消</button>
             <button class="btn btn-primary" id="genConfirmBtn" onclick="generateKeys()">生成</button>
-        </div>
-    </div>
-</div>
-
-<!-- 绑定设备模态框 -->
-<div id="bindModal" class="modal-mask hidden">
-    <div class="modal">
-        <div class="modal-title">🔗 绑定设备</div>
-        <div class="form-group">
-            <label class="form-label">卡密</label>
-            <div class="form-input" style="display:flex;align-items:center;justify-content:space-between;">
-                <span id="bindKeyCode" style="font-family:monospace;font-size:13px;">-</span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="form-label">设备ID / Roblox用户ID</label>
-            <input type="text" class="form-input" id="bindDeviceId" placeholder="DEV-XXXXXXXX 或 用户ID" autocomplete="off">
-            <div class="input-hint">用户可在卡密验证界面查看自己的设备ID</div>
-        </div>
-        <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="hideBindModal()">取消</button>
-            <button class="btn btn-primary" onclick="confirmBind()">确认绑定</button>
         </div>
     </div>
 </div>
@@ -949,9 +927,8 @@ function getFilteredKeys() {
         if (state.searchText) {
             const search = state.searchText;
             const inKey = k.key.toLowerCase().includes(search);
-            const inDevice = k.device && k.device.toLowerCase().includes(search);
-            const inNote = k.note && k.note.toLowerCase().includes(search);
-            if (!inKey && !inDevice && !inNote) return false;
+                    const inNote = k.note && k.note.toLowerCase().includes(search);
+                    if (!inKey && !inNote) return false;
         }
         // 筛选
         const f = state.currentFilter;
@@ -986,7 +963,6 @@ function renderKeys() {
         const status = getKeyStatus(k);
         const expireStr = k.expire ? new Date(k.expire * 1000).toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}) : '永久';
         const createdStr = new Date(k.created * 1000).toLocaleDateString('zh-CN');
-        const deviceStr = k.device || '<span style="color:#666;">未绑定</span>';
         
         return `
         <div class="key-item">
@@ -1007,19 +983,11 @@ function renderKeys() {
                     <span class="key-info-value">${expireStr}</span>
                 </div>
                 <div class="key-info-item">
-                    <span class="key-info-label">设备</span>
-                    <span class="key-info-value">${deviceStr}</span>
-                </div>
-                <div class="key-info-item">
                     <span class="key-info-label">创建</span>
                     <span class="key-info-value">${createdStr}</span>
                 </div>
             </div>
             <div class="key-actions">
-                <button class="btn btn-small ${k.device ? 'btn-secondary' : 'btn-success'}" 
-                    onclick="${k.device ? 'unbindKey(' + idx + ')' : 'showBindModal(' + idx + ')'}">
-                    ${k.device ? '解绑' : '绑定'}
-                </button>
                 <button class="btn btn-small btn-warning" onclick="showKeyDetail(${idx})">详情</button>
                 <button class="btn btn-small ${k.disabled ? 'btn-success' : 'btn-secondary'}" 
                     onclick="toggleDisable(${idx})">
@@ -1250,11 +1218,6 @@ function showKeyDetail(idx) {
         <div style="margin-bottom:8px;"><span style="color:#888;font-size:12px;">创建时间：</span>${createdStr}</div>
         <div style="margin-bottom:8px;"><span style="color:#888;font-size:12px;">过期时间：</span>${expireStr}</div>
         <div style="margin-bottom:8px;"><span style="color:#888;font-size:12px;">剩余天数：</span>${remainDays} 天</div>
-        <div style="margin-bottom:8px;">
-            <span style="color:#888;font-size:12px;">绑定设备：</span>
-            ${k.device ? k.device + ' <button class=\"copy-btn\" onclick=\"copyText(\'' + k.device + '\')\">复制</button>' : '<span style=\"color:#666;\">未绑定</span>'}
-        </div>
-        <div style="margin-bottom:8px;"><span style="color:#888;font-size:12px;">使用次数：</span>${k.used_count || 0}</div>
     `;
     document.getElementById('detailModal').classList.remove('hidden');
 }
